@@ -1,26 +1,24 @@
 import datetime
-import hashlib
-import jwt
-import os
-from binascii import unhexlify, hexlify as hexlify_
+from flask_bcrypt import Bcrypt
+from flask_sqlalchemy import SQLAlchemy
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, \
+                         BadSignature, SignatureExpired
 
-from . import db
 from .config import Config
 
 
-def hexlify(bytes):
-    return hexlify_(bytes).decode('utf-8')
-
-
-def pbkdf2_hash(password, salt):
-    return hexlify(hashlib.pbkdf2_hmac('sha256', password.encode(), unhexlify(salt), 100000, dklen=20))
+bcrypt = Bcrypt()
+db = SQLAlchemy()
 
 
 class BaseModel:
 
     def save(self):
+        now = datetime.datetime.now()
+        if hasattr(self, 'created') and not self.created:
+            self.created = now
         if hasattr(self, 'modified'):
-            self.modified = datetime.datetime.now()
+            self.modified = now
         if self.id is None:
             db.session.add(self)
         return db.session.commit()
@@ -34,36 +32,34 @@ class User(db.Model, BaseModel):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(96), nullable=False)
+    password_hash = db.Column(db.String(60), nullable=False)
+    created = db.Column(db.DateTime, nullable=False)
     modified = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, name, password):
-        self.name = name
-        self.update_password(password)
-        self.modified = datetime.datetime.now()
+    def __init__(self, *args, **kwargs):
+        password = kwargs.pop('password', None)
+        super().__init__(*args, **kwargs)
+        if password:
+            self.hash_password(password)
 
-    def update_password(self, password):
-        salt = hexlify(os.urandom(16))
-        hashed = pbkdf2_hash(password, salt)
-        self.password_hash = salt + hashed
+    def hash_password(self, password):
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
-        salt = self.password_hash[:32]
-        hashed = pbkdf2_hash(password, salt)
-        return self.password_hash == salt + hashed
+        return bcrypt.check_password_hash(self.password_hash, password)
 
     def generate_token(self):
-        payload = {
-            'iat': datetime.datetime.utcnow(),
-            'exp': datetime.datetime.utcnow() + Config.TOKEN_LIFETIME,
-            'sub': self.id
-        }
-        return jwt.encode(payload, Config.SECRET_KEY, algorithm='HS512').decode()
+        serializer = Serializer(Config.SECRET_KEY, expires_in=Config.TOKEN_LIFETIME)
+        return serializer.dumps({'id': self.id}).decode('utf-8')
 
     @staticmethod
-    def decode_token(token):
-        payload = jwt.decode(token, Config.SECRET_KEY)
-        return User.query.filter_by(id=payload['sub']).first()
+    def verify_token(token):
+        try:
+            serializer = Serializer(Config.SECRET_KEY)
+            data = serializer.loads(token)
+            return User.query.get(data['id'])
+        except (SignatureExpired, BadSignature):
+            return None
 
 
 class Stow(db.Model, BaseModel):
@@ -73,4 +69,5 @@ class Stow(db.Model, BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     key = db.Column(db.String(100))
     value = db.Column(db.UnicodeText)
+    created = db.Column(db.DateTime, nullable=False)
     modified = db.Column(db.DateTime, nullable=False)

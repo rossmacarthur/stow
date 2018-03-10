@@ -1,15 +1,28 @@
-from . import app
-from .views import error_handler_view, UserView, TokenView, StowView
+from flask import Flask
+
+import stow.models as models
+import stow.views as views
+from .config import Config
 
 
-def register(url, view):
-    view_name = '{} => {}.{}'.format(url, view.__module__, view.__name__)
-    view_function = view.as_view(view_name)
-    app.add_url_rule(url, view_func=view_function)
+# Initialize main app
+app = Flask(__name__)
+app.config['SECRET_KEY'] = Config.SECRET_KEY
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../stow.db'
+
+with app.app_context():
+    # Initialize extensions
+    models.bcrypt.init_app(app)
+    models.db.init_app(app)
+
+    # Initialize database
+    models.db.create_all()
+    models.db.session.commit()
 
 
-app.register_error_handler(Exception, error_handler_view)
-
-register('/user', UserView)
-register('/token', TokenView)
-register('/stow', StowView)
+# Register views
+app.register_error_handler(Exception, views.error_handler)
+views.TokenView.register(app, route_base='/api/token', strict_slashes=False)
+views.UserView.register(app, route_base='/api/user', strict_slashes=False)
+views.StowView.register(app, route_base='/api/stow', strict_slashes=False)

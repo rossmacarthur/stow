@@ -2,11 +2,14 @@ from setuptools import setup
 
 
 install_requires = [
-    'click==6.7',
     'Flask==0.12.2',
+    'Flask-Bcrypt==0.7.1',
+    'Flask-Classful==0.14.1',
+    'Flask-HTTPAuth==3.2.3',
     'Flask-SQLAlchemy==2.3.2',
     'gunicorn==19.7.1',
-    'PyJWT==1.5.3'
+    'itsdangerous==0.24',
+    'python-dateutil==2.6.1'
 ]
 
 setup(

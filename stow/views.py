@@ -1,11 +1,14 @@
-import datetime
-import jwt
+import dateutil
 import traceback
-from flask import jsonify, request
-from flask.views import MethodView
+from flask import g, jsonify, request
+from flask_classful import FlaskView, route
+from flask_httpauth import HTTPBasicAuth
 
 from .config import Config
 from .models import User, Stow
+
+
+auth = HTTPBasicAuth()
 
 
 class ServiceException(Exception):
@@ -30,7 +33,7 @@ def accepted_content_type(f):
     return decorator
 
 
-def error_handler_view(error):
+def error_handler(error):
     """
     Handle errors in views.
     """
@@ -46,112 +49,105 @@ def check_fields_present(data, *fields):
     """
     Check if certain fields are present in a dictionary else raise 400.
     """
+    missing = list()
     for field in fields:
         if field not in data:
-            raise ServiceException('\'{}\' field is missing from the request.'.format(field), 400)
+            missing.append(field)
+    if missing:
+        fields = ', '.join("'{}'".format(field) for field in missing)
+        raise ServiceException('The following fields are missing: {}'.format(fields), 400)
 
 
-def get_user():
-    """
-    Gets the user from the Authorization header otherwise raises 401.
-    """
-    token = request.headers.get('Authorization')
-    if token:
-        try:
-            user = User.decode_token(token)
-            if user:
-                return user
-            else:
-                raise ServiceException('User not found', 404)
-        except jwt.InvalidTokenError:
-            pass
-    raise ServiceException('No valid token provided', 401)
+@auth.verify_password
+def verify_password(name_or_token, password):
+    user = User.verify_token(name_or_token)
+    if not user:
+        user = User.query.filter_by(name=name_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
+    g.user = user
+    return True
 
 
-class BaseView(MethodView):
+@auth.error_handler
+def unauthorized_handler():
+    return jsonify({'message': 'Unauthorized Access'})
+
+
+class BaseView(FlaskView):
     decorators = [accepted_content_type]
-
-
-class UserView(BaseView):
-
-    def post(self):
-        data = request.get_json()
-        check_fields_present(data, 'name', 'password')
-
-        if User.query.count() >= Config.MAX_USERS:
-            raise ServiceException('No more users may be registered', 403)
-
-        user = User.query.filter_by(name=data.get('name')).first()
-        if user:
-            raise ServiceException('User with name \'{}\' already exists'.format(user.name), 202)
-
-        user = User(
-            name=data.get('name'),
-            password=data.get('password')
-        )
-        user.save()
-
-        return jsonify({'message': 'User \'{}\' registered'.format(user.name), 'token': user.generate_token()}), 201
-
-    def delete(self):
-        user = get_user()
-        user.destroy()
-        return jsonify({'message': 'User deleted'}), 200
 
 
 class TokenView(BaseView):
 
+    @auth.login_required
+    def get(self):
+        return jsonify({'token': g.user.generate_token(), 'duration': Config.TOKEN_LIFETIME})
+
+
+class UserView(BaseView):
+
+    @route('/', methods=['GET'])
+    @auth.login_required
+    def get(self):
+        return jsonify({'id': g.user.id, 'name': g.user.name,
+                        'created': g.user.created.isoformat()})
+
     def post(self):
         data = request.get_json()
         check_fields_present(data, 'name', 'password')
+        if User.query.count() >= Config.MAX_USERS:
+            raise ServiceException('No more users may be registered', 403)
+        user = User.query.filter_by(name=data['name']).first()
+        if user:
+            raise ServiceException('User with name \'{}\' already exists'.format(user.name), 409)
+        user = User(name=data['name'], password=data['password'])
+        user.save()
+        return jsonify({'message': 'User \'{}\' registered'.format(user.name)}), 201
 
-        user = User.query.filter_by(name=data.get('name')).first()
-        if not user or not user.verify_password(data.get('password')):
-            raise ServiceException('Token generation failed', 401)
-
-        return jsonify({'message': 'Token generation succeeded', 'token': user.generate_token()}), 200
+    @route('/', methods=['DELETE'])
+    @auth.login_required
+    def delete(self):
+        g.user.destroy()
+        return jsonify({'message': 'User deleted'})
 
 
 class StowView(BaseView):
+    decorators = [accepted_content_type, auth.login_required]
 
-    def get(self):
-        user = get_user()
-        data = request.args
-        check_fields_present(data, 'key')
-        stow = Stow.query.filter_by(user_id=user.id, key=data.get('key')).first()
+    @staticmethod
+    def _get_stow(key):
+        stow = Stow.query.filter_by(user_id=g.user.id, key=key).first()
         if not stow:
-            raise ServiceException('No entry was not found for key {}'.format(data.get('key')), 404)
-        return jsonify({'key': stow.key, 'value': stow.value, 'modified': stow.modified})
+            raise ServiceException('No entry was not found for key \'{}\''.format(key), 404)
+        return stow
 
-    def delete(self):
-        user = get_user()
-        data = request.args
-        check_fields_present(data, 'key')
-        stow = Stow.query.filter_by(user_id=user.id, key=data.get('key')).first()
-        if not stow:
-            raise ServiceException('No entry was not found for key {}'.format(data.get('key')), 404)
-        stow.destroy()
-        return jsonify({'message': 'Entry deleted'}), 200
+    def index(self):
+        stows = {stow.key: {'value': stow.value, 'created': stow.created.isoformat(),
+                            'modified': stow.modified.isoformat()}
+                 for stow in Stow.query.filter_by(user_id=g.user.id).all()}
+        return jsonify({'entries': stows})
 
-    def put(self):
-        user = get_user()
+    def get(self, key):
+        stow = self._get_stow(key)
+        return jsonify({'value': stow.value, 'created': stow.created.isoformat(),
+                        'modified': stow.modified.isoformat()})
+
+    def put(self, key):
         data = request.get_json()
-        check_fields_present(data, 'key', 'value')
-
-        stow = Stow.query.filter_by(user_id=user.id, key=data.get('key')).first()
+        check_fields_present(data, 'value')
+        stow = Stow.query.filter_by(user_id=g.user.id, key=key).first()
         if not stow:
-            stow = Stow()
-            stow.user_id = user.id
-            stow.key = data.get('key')
+            stow = Stow(user_id=g.user.id, key=key)
         elif 'modified' in data:
-            modified = datetime.datetime.fromtimestamp(data.get('modified'))
+            modified = dateutil.parser.parse(data['modified'])
             if modified <= stow.modified:
-                return jsonify({
-                    'message': 'Conflicting timestamps',
-                    'modified': stow.modified
-                }), 409
-
-        stow.value = data.get('value')
+                raise ServiceException('Conflicting timestamps', 409)
+        stow.value = data['value']
         stow.save()
+        return jsonify({'message': 'Entry stored successfully'})
 
-        return jsonify({'message': 'Entry stored successfully'}), 200
+    def delete(self, key):
+        stow = self._get_stow(key)
+        stow.destroy()
+        return jsonify({'message': 'Entry deleted'})
