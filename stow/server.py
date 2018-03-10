@@ -23,6 +23,6 @@ with app.app_context():
 
 # Register views
 app.register_error_handler(Exception, views.error_handler)
-views.TokenView.register(app, route_base='/api/token', strict_slashes=False)
-views.UserView.register(app, route_base='/api/user', strict_slashes=False)
-views.StowView.register(app, route_base='/api/stow', strict_slashes=False)
+views.TokenView.register(app, strict_slashes=False)
+views.UserView.register(app, strict_slashes=False)
+views.StowView.register(app, strict_slashes=False)

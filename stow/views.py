@@ -75,6 +75,7 @@ def unauthorized_handler():
 
 
 class BaseView(FlaskView):
+    route_prefix = 'api'
     decorators = [accepted_content_type]
 
 
@@ -87,7 +88,7 @@ class TokenView(BaseView):
 
 class UserView(BaseView):
 
-    @route('/', methods=['GET'])
+    @route('/', methods=['GET'], strict_slashes=False)
     @auth.login_required
     def get(self):
         return jsonify({'id': g.user.id, 'name': g.user.name,
@@ -105,7 +106,7 @@ class UserView(BaseView):
         user.save()
         return jsonify({'message': 'User \'{}\' registered'.format(user.name)}), 201
 
-    @route('/', methods=['DELETE'])
+    @route('/', methods=['DELETE'], strict_slashes=False)
     @auth.login_required
     def delete(self):
         g.user.destroy()
