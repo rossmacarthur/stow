@@ -1,13 +1,13 @@
 import dateutil
 import traceback
-from flask import g, jsonify, request
+from flask import Blueprint, g, jsonify, request
 from flask_classful import FlaskView, route
 from flask_httpauth import HTTPBasicAuth
 
-from .config import Config
-from .models import User, Stow
+from stow.config import Config
+from stow.models import User, Stow
 
-
+bp = Blueprint('api', __name__)
 auth = HTTPBasicAuth()
 
 
@@ -33,6 +33,7 @@ def accepted_content_type(f):
     return decorator
 
 
+@bp.errorhandler(Exception)
 def error_handler(error):
     """
     Handle errors in views.
@@ -75,7 +76,6 @@ def unauthorized_handler():
 
 
 class BaseView(FlaskView):
-    route_prefix = 'api'
     decorators = [accepted_content_type]
 
 
@@ -152,3 +152,7 @@ class StowView(BaseView):
         stow = self._get_stow(key)
         stow.destroy()
         return jsonify({'message': 'Entry deleted'})
+
+
+for cls in [TokenView, UserView, StowView]:
+    cls.register(bp, strict_slashes=False)

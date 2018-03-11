@@ -1,0 +1,33 @@
+<script>
+  $(document).ready(function() {
+    $("input[type='password'][data-eye]").each(function(i) {
+      var $this = $(this);
+      $this.wrap($("<div/>", {
+        style: 'position: relative'
+      }));
+      $this.after($("<div/>", {
+        class: "fa fa-eye",
+        id: "passeye-toggle-" + i,
+        style: "position: absolute; right: 15px; margin-top: -27px;"
+      }));
+      $this.after($("<input/>", {
+        type: "hidden",
+        id: "passeye-" + i
+      }));
+      $("#passeye-toggle-"+i).hover(function() {
+        $(this).css({"cursor": "pointer"})
+      })
+      $("#passeye-toggle-"+i).on("click", function() {
+        if($this.hasClass("show")) {
+          $this.attr("type", "password");
+          $this.removeClass("show");
+          $(this).removeClass("fa-eye-slash").addClass("fa-eye");
+        } else {
+          $this.attr("type", "text");
+          $this.addClass("show");
+          $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+        }
+      });
+    });
+  });
+</script>

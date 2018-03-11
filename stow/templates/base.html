@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>stow &ndash; {% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Custom meta tags -->
+    <meta name="author" content="{{ meta.author }}">
+    <meta name="description" content="{{ meta.description }}">
+    <meta name="keywords" content="{{ meta.keywords }}">
+
+    <!-- Custom fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400|Lato:400,700" rel="stylesheet" type="text/css">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <!-- Fontawesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Custom styles -->
+    <style>
+      html, body {
+        font-family: "Lato", "Arial", "Helvetica", sans-serif;
+      }
+
+      /* Sticky footer */
+      body {
+        margin-bottom: 80px;
+      }
+      html {
+        position: relative;
+        min-height: 100%;
+      }
+      footer {
+        position: absolute;
+        bottom: 0;
+      }
+
+      /* Horizontally center brand in navbar */
+      .navbar-brand {
+        font-family: "Montserrat", "Arial", "Helvetica", sans-serif;
+        letter-spacing: 6px;
+        left:calc(50% - 47px);
+        position: absolute;
+        padding:0;
+        top:15px;
+      }
+
+      .navbar-toggler:focus,
+      .navbar-toggler:active {
+        outline: 0;
+      }
+
+      /* Animated hamburger button
+      * @author Jonathan Suh @jonsuh
+      * @site https://jonsuh.com/hamburgers
+      * @link https://github.com/jonsuh/hamburgers */
+      .hamburger{padding:15px;display:inline-block;cursor:pointer;transition-property:opacity,filter;transition-duration:.15s;transition-timing-function:linear;font:inherit;color:inherit;text-transform:none;background-color:transparent;border:0;margin:0;overflow:visible}.hamburger:hover{opacity:.7}.hamburger-box{width:40px;height:24px;display:inline-block;position:relative}.hamburger-inner{display:block;top:50%;margin-top:-2px}.hamburger-inner,.hamburger-inner::before,.hamburger-inner::after{width:40px;height:4px;background-color:#000;border-radius:4px;position:absolute;transition-property:transform;transition-duration:.15s;transition-timing-function:ease}.hamburger-inner::before,.hamburger-inner::after{content:"";display:block}.hamburger-inner::before{top:-10px}.hamburger-inner::after{bottom:-10px}.hamburger--squeeze .hamburger-inner{transition-duration:.075s;transition-timing-function:cubic-bezier(.55,.055,.675,.19)}.hamburger--squeeze .hamburger-inner::before{transition:top .075s .12s ease,opacity .075s ease}.hamburger--squeeze .hamburger-inner::after{transition:bottom .075s .12s ease,transform .075s cubic-bezier(.55,.055,.675,.19)}.hamburger--squeeze.is-active .hamburger-inner{transform:rotate(45deg);transition-delay:.12s;transition-timing-function:cubic-bezier(.215,.61,.355,1)}.hamburger--squeeze.is-active .hamburger-inner::before{top:0;opacity:0;transition:top .075s ease,opacity .075s .12s ease}.hamburger--squeeze.is-active .hamburger-inner::after{bottom:0;transform:rotate(-90deg);transition:bottom .075s ease,transform .075s .12s cubic-bezier(.215,.61,.355,1)}
+
+      .hamburger-inner,
+      .hamburger-inner::before,
+      .hamburger-inner::after {
+        border-radius: 0px;
+        background-color: #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-light">
+      <a href="{{ url_for('web.IndexView:index') }}" class="navbar-brand"><h2>stow</h2></a>
+      <button class="navbar-toggler hamburger hamburger--squeeze ml-auto" type="button" data-toggle="collapse" data-target="#navbar" style="border: none;">
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+      </button>
+      <div class="navbar-collapse collapse" id="navbar">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('web.IndexView:index') }}">Home</a>
+          </li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('web.AccountView:index') }}">Account</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('web.LogoutView:index') }}">Logout</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+
+    <section class="container-fluid px-3 pt-4">
+      {% block content %}
+        <!-- Content here -->
+      {% endblock %}
+    </section>
+
+    <footer class="footer text-center w-100 py-3">
+      <span class="text-muted">&copy; Copyright 2018 &mdash; Ross MacArthur</span>
+    </footer>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    {% block scripts %}
+      <!-- Custom scripts -->
+    {% endblock %}
+
+    <script>
+      $('.navbar-toggler').on('click', function () {
+        $(this).toggleClass('is-active');
+        $('.navbar-collapse.show[id]').each(function () {
+          $('.navbar-toggler.is-active[data-target="#' + $(this).attr('id') + '"]').click();
+        });
+      });
+    </script>
+  </body>
+</html>

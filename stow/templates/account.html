@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Account{% endblock %}
+
+{% block content %}
+  <div class="mx-auto" style="max-width: 1000px;">
+    <div>
+      {% include 'partials/alert.html' %}
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg border border-muted rounded my-1 mx-lg-1 p-3">
+          <h5 class="py-2">Account Details</h5>
+          <div class="py-2">
+            <div>Name</div>
+            <div class="text-secondary">{{ current_user.name }}</div>
+          </div>
+          <div class="py-2">
+            <div>Created</div>
+            <div class="text-secondary">{{ current_user.created.strftime('%d %b %Y @ %H:%M') }}</div>
+          </div>
+          <div class="py-2">
+            <div>Credentials last modified</div>
+            <div class="text-secondary">{{ current_user.modified.strftime('%d %b %Y @ %H:%M') }}</div>
+          </div>
+          <div class="py-2">
+            <div>Number of stow entries</div>
+            <div class="text-secondary">{{ stow_count }}</div>
+          </div>
+        </div>
+        <div class="col-lg border border-muted rounded my-1 mx-lg-1 p-3">
+          <h5 class="py-2">Update Account</h5>
+          <form class="pt-2" method="POST">
+            {{ form.csrf }}
+            <div class="form-group">
+              {{ form.name.label }}
+              {{ form.name(class_='form-control', style='max-width: 250px;', autofocus=true) }}
+            </div>
+            <div class="form-group" style="max-width: 250px;">
+              {{ form.old_password.label }}
+              {{ form.old_password(class_='form-control') }}
+            </div>
+            <div class="form-group" style="max-width: 250px;">
+              {{ form.new_password.label }}
+              {{ form.new_password(class_='form-control', data_eye=true) }}
+            </div>
+            <div class="form-row">
+              <div class="form-group px-1">
+                {{ form.change_credentials(class_='btn btn-primary') }}
+              </div>
+              <div class="form-group px-1">
+                {{ form.delete_account(class_='btn btn-danger') }}
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {% include 'partials/passeye.html' %}
+{% endblock %}

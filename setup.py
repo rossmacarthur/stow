@@ -6,10 +6,12 @@ install_requires = [
     'Flask-Bcrypt==0.7.1',
     'Flask-Classful==0.14.1',
     'Flask-HTTPAuth==3.2.3',
+    'Flask-Login==0.4.1',
     'Flask-SQLAlchemy==2.3.2',
     'gunicorn==19.7.1',
     'itsdangerous==0.24',
-    'python-dateutil==2.6.1'
+    'python-dateutil==2.6.1',
+    'WTForms==2.1'
 ]
 
 setup(

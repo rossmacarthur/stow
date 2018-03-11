@@ -13,3 +13,8 @@ class Config:
     SECRET_KEY = get_environment_variable('SECRET_KEY')
     MAX_USERS = 1
     TOKEN_LIFETIME = 3600
+    META = {
+        'author': 'Ross MacArthur',
+        'description': 'A Flask app to securely store and retrieve data.',
+        'keywords': 'flask store retrieve key value secure'
+    }

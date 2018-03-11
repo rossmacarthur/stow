@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  <div class="mx-auto" style="max-width: 1000px;">
+    <div>
+      {% include 'partials/alert.html' %}
+    </div>
+    <div>
+      {% if stows %}
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th class="d-none d-sm-table-cell">Value</th>
+                <th class="d-none d-sm-table-cell">Modified</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stow in stows %}
+                <tr>
+                  <td>{{ stow.key }}</td>
+                  <td class="d-none d-sm-table-cell">{{ stow.value|truncate(length=25, end='...') }}</td>
+                  <td class="d-none d-sm-table-cell">{{ stow.modified.strftime('%d %b %Y @ %H:%M') }}</td>
+                  <td>
+                    <a class="btn btn-link" href="{{ url_for('web.StowView:get', key=stow.key, _external=True) }}">Edit</a>
+                  </td>
+                  <td>
+                    <form method="POST" action="{{ url_for('web.StowView:post_0', key=stow.key, _external=True) }}">
+                      <button class="btn btn-link text-danger" type="delete" name="delete" value="delete" onclick="return confirm('Are you sure you want to delete \'{{ stow.key }}\'?');">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+    </div>
+    <div>
+      <a class="btn btn-block btn-primary mx-auto" style="max-width: 100px" href="{{ url_for('web.StowView:index') }}" role="button">New</a>
+    </div>
+  </div>
+{% endblock %}

@@ -54,7 +54,9 @@ Note: Supervisor only works under Python 2.
 
 To update an install to the latest version:
 ```
-git -C /var/www/stow pull
+cd /var/www/stow
+git pull
+venv/bin/pip install -e .
 supervisorctl restart stow
 ```
 
