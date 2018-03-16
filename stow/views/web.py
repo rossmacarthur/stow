@@ -7,7 +7,7 @@ from flask_login import current_user, LoginManager, login_required, login_user, 
 from stow.config import Config
 from stow.forms import ChangeCredentialsForm, LoginForm, RegisterForm, StowForm
 from stow.models import User, Stow
-from stow.patches import url_for
+from stow.patches import url_for, url_with_host
 
 bp = Blueprint('web', __name__)
 login_manager = LoginManager()
@@ -59,7 +59,7 @@ def unauthorized_handler():
     """
     If a user is not logged in, redirect to the login page.
     """
-    return redirect(url_for('web.LoginView:index', next=request.path))
+    return redirect(url_for('web.LoginView:index', next=url_with_host(request.path)))
 
 
 @login_manager.user_loader

@@ -1,12 +1,22 @@
-from flask import url_for as _url_for
+from urllib.parse import urlparse
+from flask import request, url_for as _url_for
+
+
+def url_with_host(path):
+    """
+    Prepend the host URL excluding the domain name to a path.
+    """
+    return '/'.join((urlparse(request.host_url).path.rstrip('/'), path.lstrip('/')))
 
 
 def url_for(*args, **kwargs):
     """
-    Set external True on all URL's.
+    Prepend the host URL excluding the domain name to all non external URLs.
     """
-    kwargs['_external'] = True
-    return _url_for(*args, **kwargs)
+    if kwargs.get('_external') is True:
+        return _url_for(*args, **kwargs)
+    else:
+        return url_with_host(_url_for(*args, **kwargs))
 
 
 def contains(value, substring):

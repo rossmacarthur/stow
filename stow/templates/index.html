@@ -27,10 +27,10 @@
                   <td class="d-none d-sm-table-cell">{{ stow.value|truncate(length=25, end='...') }}</td>
                   <td class="d-none d-sm-table-cell">{{ stow.modified.strftime('%d %b %Y @ %H:%M') }}</td>
                   <td>
-                    <a class="btn btn-link" href="{{ url_for('web.StowView:get', key=stow.key, _external=True) }}">Edit</a>
+                    <a class="btn btn-link" href="{{ url_for('web.StowView:get', key=stow.key) }}">Edit</a>
                   </td>
                   <td>
-                    <form method="POST" action="{{ url_for('web.StowView:post_0', key=stow.key, _external=True) }}">
+                    <form method="POST" action="{{ url_for('web.StowView:post_0', key=stow.key) }}">
                       <button class="btn btn-link text-danger" type="delete" name="delete" value="delete" onclick="return confirm('Are you sure you want to delete \'{{ stow.key }}\'?');">Delete</button>
                     </form>
                   </td>
