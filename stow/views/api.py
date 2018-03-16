@@ -1,4 +1,4 @@
-import dateutil
+import dateutil.parser
 import traceback
 from flask import Blueprint, g, jsonify, request
 from flask_classful import FlaskView, route
