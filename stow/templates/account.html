@@ -31,7 +31,7 @@
         <div class="col-lg border border-muted rounded my-1 mx-lg-1 p-3">
           <h5 class="py-2">Update Account</h5>
           <form class="pt-2" method="POST">
-            {{ form.csrf }}
+            {{ form.csrf_token }}
             <div class="form-group">
               {{ form.name.label }}
               {{ form.name(class_='form-control', style='max-width: 250px;', autofocus=true) }}

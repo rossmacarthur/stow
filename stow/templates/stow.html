@@ -11,7 +11,7 @@
     </div>
     <div>
       <form method="POST">
-        {{ form.csrf }}
+        {{ form.csrf_token }}
         <div class="form-group">
           {{ form.key.label }}
           {{ form.key(class_='form-control', style="max-width: 250px;") }}
