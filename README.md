@@ -6,18 +6,19 @@ A Flask app to securely PUT and GET data.
   - [Prerequisites](#prerequisites)
   - [Installing](#installing)
 - [Deploying](#deploying)
-  - [Prerequisites](#prerequisites-1)
+  - [Prerequisites](#prerequisites)
   - [Updating](#updating)
-  - [Installing](#installing-1)
+  - [Installing](#installing)
 - [API](#api)
-- [License](#License)
+- [License](#license)
 - [Acknowledgments](#acknowledgments)
 
 ## Getting started
 
 ### Prerequisites
 
-For development you will need [Python 3](https://www.python.org/downloads/) and [Virtualenv](https://pypi.python.org/pypi/virtualenv). You can install Virtualenv with:
+For development you will need [Python 3][python] and [Virtualenv][virtualenv].
+You can install Virtualenv with:
 ```
 pip install virtualenv
 ```
@@ -37,18 +38,18 @@ export SECRET_KEY=$(./bin/secret_key)
 make run
 ```
 
-The API will then be available at [http://localhost:5001](http://localhost:5001).
+The API will then be available at http://localhost:5001.
 
 ## Deploying
 
 ### Prerequisites
 
-For production you will need [Nginx](https://www.nginx.com/) or equivalent, [Python 2](https://www.python.org/downloads/), [Python 3](https://www.python.org/downloads/), [Supervisor](https://pypi.python.org/pypi/supervisor), and [Virtualenv](https://pypi.python.org/pypi/virtualenv). You can install Supervisor and Virtualenv with:
+For production you will need [Nginx][nginx] or equivalent, [Python 3][python],
+[Supervisor][supervisor], and [Virtualenv][virtualenv]. You can install
+Supervisor and Virtualenv with:
 ```
 pip install supervisor virtualenv
 ```
-
-Note: Supervisor only works under Python 2.
 
 ### Updating
 
@@ -64,7 +65,8 @@ supervisorctl restart stow
 
 First clone the repository:
 ```
-git clone git@github.com:rossmacarthur/stow.git /var/www/stow && cd /var/www/stow
+git clone git@github.com:rossmacarthur/stow.git /var/www/stow
+cd /var/www/stow
 ```
 
 Then build and add to supervisor:
@@ -92,18 +94,28 @@ You can then GET from `/api/stow/<key>` to retrieve:
  "created": "2018-03-10T10:25:35.576296"}
 ```
 
-Of course to do the above you need to provide authorization. You must first register a user by POST to `/api/user` with:
+Of course to do the above you need to provide authorization. You must first
+register a user by POST to `/api/user` with:
 ```
 {"name": "John Smith",
  "password": "secret1234"}
 ```
 
-You can then use HTTP Basic Auth with the name and password. Or if you prefer you can request a token from `/api/token` and use this as the HTTP Basic Auth username (in this case the password can be left blank or set to an arbitrary value). The token will last for an hour.
+You can then use HTTP Basic Auth with the name and password. Or if you prefer
+you can request a token from `/api/token` and use this as the HTTP Basic Auth
+username (in this case the password can be left blank or set to an arbitrary
+value). The token will last for an hour.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE.txt](LICENSE.txt) file.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file.
 
 ## Acknowledgments
 
-I found Miguel Grinberg's HTTP Basic Auth [Flask example app](https://github.com/miguelgrinberg/REST-auth) helpful.
+I found Miguel Grinberg's HTTP Basic Auth [Flask example app][example] helpful.
+
+[example]: https://github.com/miguelgrinberg/REST-auth
+[nginx]: https://www.nginx.com/
+[python]: https://www.python.org/downloads/
+[supervisor]: https://pypi.org/project/supervisor/
+[virtualenv]: https://pypi.org/project/virtualenv/
