@@ -1,11 +1,13 @@
-import dateutil.parser
 import traceback
+
 from flask import Blueprint, g, jsonify, request
 from flask_classful import FlaskView, route
 from flask_httpauth import HTTPBasicAuth
 
+import isodate
 from stow.config import Config
-from stow.models import User, Stow
+from stow.models import Stow, User
+
 
 bp = Blueprint('api', __name__)
 auth = HTTPBasicAuth()
@@ -141,7 +143,7 @@ class StowView(BaseView):
         if not stow:
             stow = Stow(user_id=g.user.id, key=key)
         elif 'modified' in data:
-            modified = dateutil.parser.parse(data['modified'])
+            modified = isodate.parse_datetime(data['modified'])
             if modified <= stow.modified:
                 raise ServiceException('Conflicting timestamps', 409)
         stow.value = data['value']

@@ -1,17 +1,18 @@
 from flask import Flask
 
 import stow.models as models
-from stow.views import api, web
 from stow.config import Config
 from stow.patches import register_patches
+from stow.views import api, web
+
 
 # Initialize main app
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder='../templates'
+)
+app.config.from_object(Config)
 app.jinja_env.auto_reload = True
-app.config['SECRET_KEY'] = Config.SECRET_KEY
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../stow.db'
-app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 register_patches(app)
 

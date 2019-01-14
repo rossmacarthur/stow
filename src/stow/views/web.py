@@ -1,13 +1,15 @@
-from sqlalchemy.exc import IntegrityError
-from urllib.parse import urlparse, urljoin
-from flask import Blueprint, flash, redirect, render_template, request, abort
+from urllib.parse import urljoin, urlparse
+
+from flask import Blueprint, abort, flash, redirect, render_template, request
 from flask_classful import FlaskView, route
-from flask_login import current_user, LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+from sqlalchemy.exc import IntegrityError
 
 from stow.config import Config
 from stow.forms import ChangeCredentialsForm, LoginForm, RegisterForm, StowForm
-from stow.models import User, Stow
+from stow.models import Stow, User
 from stow.patches import url_for, url_with_host
+
 
 bp = Blueprint('web', __name__)
 login_manager = LoginManager()

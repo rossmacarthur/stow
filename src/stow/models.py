@@ -1,9 +1,10 @@
 import datetime
+
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, \
-                         BadSignature, SignatureExpired
+from itsdangerous import BadSignature, SignatureExpired
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from stow.config import Config
 

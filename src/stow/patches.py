@@ -1,5 +1,7 @@
 from urllib.parse import urlparse
-from flask import request, url_for as _url_for
+
+from flask import request
+from flask import url_for as _url_for
 
 
 def url_with_host(path):

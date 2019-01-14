@@ -1,26 +1,37 @@
-.PHONY: help clean build build-all lint run
+.PHONY: help clean install install-dev install-all \
+		lint sort-imports test dist release
 
-help:
-	@echo "clean      Remove all build artifacts."
-	@echo "build      Create venv and install package."
-	@echo "build-all  Create venv and install package and development dependencies."
-	@echo "lint       Run PEP8 lints."
-	@echo "help       Show this message and exit."
+VIRTUAL_ENV := $(or $(VIRTUAL_ENV), $(VIRTUAL_ENV), venv)
 
-clean:
-	find . -name \*.pyc -o -name \*.pyo -o -name __pycache__ -delete
-	rm -rf build dist wheels venv *.egg-info
+help: ## Show this message and exit.
+	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} \
+	/^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-build:
-	virtualenv --python=python3 venv
-	venv/bin/pip install -e .
 
-build-all:
-	virtualenv --python=python3 venv
-	venv/bin/pip install -e .[linting]
+clean: ## Remove all build artifacts.
+	rm -rf build dist wheels
+	find . \( -name *.pyc -o -name *.pyo -o -name __pycache__ -o -name *.egg-info \) -exec rm -rf {} +
 
-lint:
-	venv/bin/flake8 .
+install: ## Install package.
+	$(VIRTUAL_ENV)/bin/pip install -e .
 
-run:
-	venv/bin/gunicorn --access-logfile - -w 1 -b 127.0.0.1:5001 stow.server:app --reload
+install-dev: ## Install package and linting and testing dependencies.
+	$(VIRTUAL_ENV)/bin/pip install -e ".[dev.lint,dev.test]"
+
+lint: ## Run all lints.
+	$(VIRTUAL_ENV)/bin/flake8 --max-complexity 10 .
+
+sort-imports: ## Sort import statements according to isort configuration.
+	$(VIRTUAL_ENV)/bin/isort --recursive .
+
+test: ## Run all tests.
+	$(VIRTUAL_ENV)/bin/pytest -vv --cov=stow --cov-report term-missing tests
+
+run: ## Run development server.
+	gunicorn --access-logfile - -w 1 -b 127.0.0.1:5001 stow.server:app --reload
+
+dist: clean ## Build source and wheel package.
+	$(VIRTUAL_ENV)/bin/python setup.py sdist bdist_wheel
+
+release: dist ## Package and upload a release.
+	$(VIRTUAL_ENV)/bin/twine upload dist/*
