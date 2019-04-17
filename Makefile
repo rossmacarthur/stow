@@ -1,5 +1,9 @@
 VIRTUAL_ENV := $(or $(VIRTUAL_ENV), $(VIRTUAL_ENV), venv)
 
+export FLASK_APP := $(or $(FLASK_APP), stow.server)
+export FLASK_ENV := $(or $(FLASK_ENV), development)
+export FLASK_SECRET_KEY := $(or $(FLASK_SECRET_KEY), $(shell ./bin/secret-key))
+
 .PHONY: help
 help: ## Show this message and exit.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} \

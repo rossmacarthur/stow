@@ -143,7 +143,7 @@ class StowView(BaseView):
 
         return stow
 
-    def index(self):}
+    def index(self):
         return jsonify({
             'entries': {
                 stow.key: {

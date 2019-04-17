@@ -35,13 +35,6 @@ Then inside the virtual environment install the app
 make install-dev
 ```
 
-To run the development server you will need to export the following
-```
-export FLASK_APP="stow.server"
-export FLASK_ENV="development"
-export FLASK_SECRET_KEY="$(./bin/secret_key)"
-```
-
 Create the database and run all migrations
 ```
 make migrate

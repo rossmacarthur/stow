@@ -18,7 +18,7 @@ def dirnames(path, up=1):
     if up == 0:
         return path
     else:
-        return os.path.dirname(dirnames(path, up=up-1))
+        return os.path.dirname(dirnames(path, up=up - 1))
 
 
 class BaseConfig:
@@ -39,10 +39,7 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    SECRET_KEY = get_environment_variable(
-        'FLASK_SECRET_KEY',
-        default='secret'
-    )
+    SECRET_KEY = get_environment_variable('FLASK_SECRET_KEY', default='secret')
 
 
 class ProductionConfig(BaseConfig):
