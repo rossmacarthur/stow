@@ -10,19 +10,21 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    name = TextField('Name', [validators.DataRequired(),
-                              validators.Length(min=3),
-                              validators.Length(max=99)])
-    password = PasswordField('Password', [validators.DataRequired(),
-                                          validators.Length(min=8)])
+    name = TextField(
+        'Name', [validators.DataRequired(), validators.Length(min=3), validators.Length(max=99)]
+    )
+    password = PasswordField(
+        'Password', [validators.DataRequired(), validators.Length(min=8)]
+    )
     register = SubmitField()
 
 
 class ChangeCredentialsForm(FlaskForm):
     name = TextField('Name', [validators.DataRequired()])
     old_password = PasswordField('Old Password', [validators.DataRequired()])
-    new_password = PasswordField('New Password', [validators.DataRequired(),
-                                                  validators.Length(min=8)])
+    new_password = PasswordField(
+        'New Password', [validators.DataRequired(), validators.Length(min=8)]
+    )
     change_credentials = SubmitField()
     delete_account = SubmitField()
 

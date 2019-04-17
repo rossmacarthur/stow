@@ -33,5 +33,4 @@ def register_patches(app):
     app.jinja_env.globals['url_for'] = url_for
 
     # Register Jinja filters
-    for func in [contains]:
-        app.jinja_env.filters[func.__name__] = func
+    app.jinja_env.filters['contains'] = contains

@@ -17,12 +17,16 @@ class BaseModel:
 
     def save(self):
         now = datetime.datetime.now()
+
         if hasattr(self, 'created') and not self.created:
             self.created = now
+
         if hasattr(self, 'modified'):
             self.modified = now
+
         if self.id is None:
             db.session.add(self)
+
         return db.session.commit()
 
     def destroy(self):
@@ -32,6 +36,7 @@ class BaseModel:
 
 class User(db.Model, BaseModel, UserMixin):
     __tablename__ = 'user'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(60), nullable=False)
@@ -41,6 +46,7 @@ class User(db.Model, BaseModel, UserMixin):
     def __init__(self, *args, **kwargs):
         password = kwargs.pop('password', None)
         super().__init__(*args, **kwargs)
+
         if password:
             self.hash_password(password)
 
@@ -67,6 +73,7 @@ class User(db.Model, BaseModel, UserMixin):
 class Stow(db.Model, BaseModel):
     __tablename__ = 'stow'
     __table_args__ = (db.UniqueConstraint('user_id', 'key'),)
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     key = db.Column(db.String(100))
