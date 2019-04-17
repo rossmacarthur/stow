@@ -34,8 +34,10 @@ def redirect_next(target, *args, **kwargs):
     Redirect to the the next argument else the target.
     """
     next = request.args.get('next')
+
     if not is_safe_url(next):
         return abort(400)
+
     return redirect(next or target)
 
 
@@ -122,6 +124,7 @@ class LoginView(UnprotectedTemplateView):
     def index(self):
         if current_user:
             redirect(url_for('web.IndexView:index'))
+
         form = LoginForm(request.form)
         return self.render(form=form)
 
@@ -170,7 +173,7 @@ class AccountView(TemplateView):
         if current_user.name.lower() != form.name.data.lower():
             user = User.query.filter(User.name.ilike(form.name.data)).first()
             if user:
-                flash('The name \'{}\' is not available.'.format(form.name.data), 'danger')
+                flash('The name {!r} is not available.'.format(form.name.data), 'danger')
                 return self.render(form=form)
 
         if not current_user.verify_password(form.old_password.data):
@@ -215,7 +218,7 @@ class StowView(TemplateView):
             stow = Stow.query.filter_by(user_id=current_user.id, key=key).first()
             if form.delete.data is True:
                 stow.destroy()
-                flash('Deleted stow \'{}\'.'.format(stow.key), 'info')
+                flash('Deleted stow {!r}.'.format(stow.key), 'info')
                 return redirect(url_for('web.IndexView:index'))
 
         if not form.validate():
@@ -235,9 +238,9 @@ class StowView(TemplateView):
             return self.render(form=form)
 
         if key:
-            flash('Updated stow \'{}\'.'.format(stow.key), 'info')
+            flash('Updated stow {!r}.'.format(stow.key), 'info')
         else:
-            flash('Created stow \'{}\'.'.format(stow.key), 'info')
+            flash('Created stow {!r}.'.format(stow.key), 'info')
 
         return redirect(url_for('web.IndexView:index'))
 
