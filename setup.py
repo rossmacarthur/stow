@@ -37,31 +37,17 @@ metadata = get_metadata()
 
 # Primary requirements
 install_requires = [
-    'alembic==1.0.9',
-    'bcrypt==3.1.6',
-    'cffi==1.12.2',
-    'Click==7.0',
-    'Flask==1.0.2',
-    'Flask-Bcrypt==0.7.1',
-    'Flask-Classful==0.14.2',
-    'Flask-HTTPAuth==3.2.4',
-    'Flask-Login==0.4.1',
-    'Flask-Migrate==2.4.0',
-    'Flask-SQLAlchemy==2.3.2',
-    'Flask-WTF==0.14.2',
-    'gunicorn==19.9.0',
-    'itsdangerous==1.1.0',
-    'isodate==0.6.0',
-    'Jinja2==2.10.1',
-    'Mako==1.0.9',
-    'MarkupSafe==1.1.1',
-    'pycparser==2.19',
-    'python-dateutil==2.8.0',
-    'python-editor==1.0.4',
-    'six==1.12.0',
-    'SQLAlchemy==1.3.3',
-    'Werkzeug==0.15.2',
-    'WTForms==2.2.1'
+    'Flask >=1.0.0,<2.0.0',
+    'Flask-Bcrypt >=0.7.0,<0.8.0',
+    'Flask-Classful >=0.14.0,<0.15.0',
+    'Flask-HTTPAuth >=3.0.0,<4.0.0',
+    'Flask-Login >=0.4.0,<0.5.0',
+    'Flask-Migrate >=2.0.0,<3.0.0',
+    'Flask-SQLAlchemy >=2.0.0,<3.0.0',
+    'Flask-WTF >=0.14.0,<0.15.0',
+    'gunicorn >=19.0.0,<20.0.0',
+    'itsdangerous >=1.0.0,<2.0.0',
+    'WTForms >=2.0.0,<3.0.0'
 ]
 
 # Development requirements

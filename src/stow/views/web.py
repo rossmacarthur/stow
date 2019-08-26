@@ -3,7 +3,7 @@ from urllib.parse import urljoin, urlparse
 from flask import Blueprint, abort, flash, redirect, render_template, request
 from flask_classful import FlaskView, route
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-from sqlalchemy.exc import IntegrityError
+from flask_sqlalchemy.sqlalchemy.exc import IntegrityError
 
 from stow.config import Config
 from stow.forms import ChangeCredentialsForm, LoginForm, RegisterForm, StowForm
