@@ -18,7 +18,7 @@ flask-wtf==0.14.2
 flask==1.1.1
 gunicorn==19.9.0
 itsdangerous==1.1.0
-jinja2==2.10.1            # via flask
+jinja2==2.11.3            # via flask
 mako==1.1.0               # via alembic
 markupsafe==1.1.1         # via jinja2, mako
 pycparser==2.19           # via cffi
