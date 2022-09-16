@@ -19,7 +19,7 @@ flask==1.1.1
 gunicorn==19.9.0
 itsdangerous==1.1.0
 jinja2==2.10.1            # via flask
-mako==1.1.0               # via alembic
+mako==1.2.2               # via alembic
 markupsafe==1.1.1         # via jinja2, mako
 pycparser==2.19           # via cffi
 python-dateutil==2.8.0    # via alembic
